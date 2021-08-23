@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from brownie import SimpleCollectible, accounts, network, config, Contract
+from brownie import SimpleCollectible, accounts, network, config
 from scripts.helpful_scripts import OPENSEA_FORMAT
 
 

@@ -8,20 +8,22 @@ contract SimpleCollectible is ERC721 {
     uint256 public tokenCounter;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     address private _owner;
-
+    uint256 private max_tokens = 100; //Set desired Nft cap
 
     constructor () public ERC721 ("Picasso_Musks", "MUSK"){
         tokenCounter = 0;
         _setOwner(msg.sender);
     }
 
-    function createCollectible(string memory tokenURI) public returns (uint256) {
+    function createCollectible(string memory tokenURI) public {
         uint256 newItemId = tokenCounter;
+        require(tokenCounter < max_tokens);
         _safeMint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
         tokenCounter = tokenCounter + 1;
-        return newItemId;
+        
     }
+
 
      function _setOwner(address newOwner) private {
         address oldOwner = _owner;
