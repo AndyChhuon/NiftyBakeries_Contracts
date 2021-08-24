@@ -2,28 +2,41 @@
 pragma solidity 0.6.6;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 
-contract SimpleCollectible is ERC721 {
-    uint256 public tokenCounter;
+
+contract Nft_Collectible_Contract is ERC721 {
+    using Strings for string;
+    uint public tokenCounter;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     address private _owner;
-    uint256 private max_tokens = 100; //Set desired Nft cap
+    uint256 private max_tokens = 100;
+    string public basicURI = 'https://gateway.pinata.cloud/ipfs/QmaKps84bUPFX4sxWhT5b7HrdgYtRmzH7AxvHR6HT6D7tV/JSON/json';
+    string public tokenURI;
+
 
     constructor () public ERC721 ("Picasso_Musks", "MUSK"){
         tokenCounter = 0;
         _setOwner(msg.sender);
     }
 
-    function createCollectible(string memory tokenURI) public {
-        uint256 newItemId = tokenCounter;
-        require(tokenCounter < max_tokens);
-        _safeMint(msg.sender, newItemId);
-        _setTokenURI(newItemId, tokenURI);
-        tokenCounter = tokenCounter + 1;
-        
+    function findtokenURI(uint _optionId) private returns (string memory) {
+        return tokenURI = string(abi.encodePacked(basicURI,Strings.toString(_optionId)));
     }
+    
 
+
+
+    function create_an_nft(uint256 amount) public {
+        require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
+        for (uint256 i = 0; i<amount; i++){
+            uint newItemId = tokenCounter;
+            _safeMint(msg.sender, newItemId);
+            _setTokenURI(newItemId, findtokenURI(newItemId));
+            tokenCounter = tokenCounter + 1;
+        }
+    }
 
      function _setOwner(address newOwner) private {
         address oldOwner = _owner;
