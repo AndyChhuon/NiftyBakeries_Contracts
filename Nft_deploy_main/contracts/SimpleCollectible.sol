@@ -26,8 +26,6 @@ contract Nft_Collectible_Contract is ERC721 {
     }
     
 
-
-
     function create_an_nft(uint256 amount) public {
         require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
         for (uint256 i = 0; i<amount; i++){
@@ -36,6 +34,21 @@ contract Nft_Collectible_Contract is ERC721 {
             _setTokenURI(newItemId, findtokenURI(newItemId));
             tokenCounter = tokenCounter + 1;
         }
+    }
+
+    function create_nft_at_address (uint256 amount, address receiver) public onlyOwner {
+        require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
+        for (uint256 i = 0; i<amount; i++){
+            uint newItemId = tokenCounter;
+            _safeMint(receiver, newItemId);
+            _setTokenURI(newItemId, findtokenURI(newItemId));
+            tokenCounter = tokenCounter + 1;
+
+        }
+    }
+
+    function update_token_uri(uint256 ItemId, string memory token_Uri) public onlyOwner{
+        _setTokenURI(ItemId, token_Uri);
     }
 
      function _setOwner(address newOwner) private {

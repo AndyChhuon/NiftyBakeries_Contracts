@@ -3,7 +3,7 @@ from brownie import Nft_Collectible_Contract, accounts, network, config
 from scripts.helpful_scripts import OPENSEA_FORMAT
 
 
-address = '0xd3ff4823d7fc1593f1ec8aa6e68b242dcf2057f5' #select address
+address = '0x0F7aD5881387823ad1849Fd832705fd502d583c4' #select contract address
 nfts_printed = 5 #Select amount of nfts purchased
 
 
