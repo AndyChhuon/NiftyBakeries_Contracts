@@ -1,9 +1,10 @@
 #!/usr/bin/python3
+#Script creates nfts at latest Contract address
 from brownie import Nft_Collectible_Contract, accounts, network, config
 from scripts.helpful_scripts import OPENSEA_FORMAT
 import os
 
-nfts_printed = 5 #Select amount of nfts purchased
+nfts_printed = 10 #Select amount of nfts purchased
 
 
 

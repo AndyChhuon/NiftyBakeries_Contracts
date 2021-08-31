@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 
-
 contract Nft_Collectible_Contract is ERC721 {
+    
+    
     using Strings for string;
     uint public tokenCounter;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -14,6 +15,7 @@ contract Nft_Collectible_Contract is ERC721 {
     uint256 private max_tokens = 100;
     string public basicURI = 'https://gateway.pinata.cloud/ipfs/QmaKps84bUPFX4sxWhT5b7HrdgYtRmzH7AxvHR6HT6D7tV/JSON/json';
     string public tokenURI;
+    uint public nb_shares =0;
 
 
     constructor () public ERC721 ("Picasso_Musks", "MUSK"){
@@ -33,6 +35,7 @@ contract Nft_Collectible_Contract is ERC721 {
             _safeMint(msg.sender, newItemId);
             _setTokenURI(newItemId, findtokenURI(newItemId));
             tokenCounter = tokenCounter + 1;
+            nb_shares++;
         }
     }
 
@@ -43,15 +46,19 @@ contract Nft_Collectible_Contract is ERC721 {
             _safeMint(receiver, newItemId);
             _setTokenURI(newItemId, findtokenURI(newItemId));
             tokenCounter = tokenCounter + 1;
+            nb_shares++;
 
         }
     }
+
+    
 
     function update_token_uri(uint256 ItemId, string memory token_Uri) public onlyOwner{
         _setTokenURI(ItemId, token_Uri);
     }
 
-     function _setOwner(address newOwner) private {
+     
+    function _setOwner(address newOwner) private {
         address oldOwner = _owner;
         _owner = newOwner;
         emit OwnershipTransferred(oldOwner, newOwner);

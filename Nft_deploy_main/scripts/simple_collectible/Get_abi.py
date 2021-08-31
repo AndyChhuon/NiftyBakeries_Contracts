@@ -1,3 +1,5 @@
+#Script get abi for contract
+
 import json
 
 with open("build/Contracts/Nft_Collectible_Contract.json") as f:

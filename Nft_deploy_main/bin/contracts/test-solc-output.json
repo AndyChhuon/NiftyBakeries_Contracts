@@ -1,0 +1,223 @@
+{
+    "contracts": {
+        "c:/Users/andyc/OneDrive/Desktop/Visual Studio Code/Nft_Deployment/Nft_deploy_main_test/contracts/test.sol": {
+            "test": {
+                "abi": [
+                    {
+                        "inputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "constructor"
+                    }
+                ],
+                "devdoc": {
+                    "methods": {}
+                },
+                "evm": {
+                    "bytecode": {
+                        "linkReferences": {},
+                        "object": "608060405260008055348015601357600080fd5b50600080546001019055603f80602a6000396000f3fe6080604052600080fdfea26469706673582212202412a9a2c1b6c97e13045845c09b4f401e9b3bf376f525c8f769585c68fa332464736f6c63430006060033",
+                        "opcodes": "PUSH1 0x80 PUSH1 0x40 MSTORE PUSH1 0x0 DUP1 SSTORE CALLVALUE DUP1 ISZERO PUSH1 0x13 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP PUSH1 0x0 DUP1 SLOAD PUSH1 0x1 ADD SWAP1 SSTORE PUSH1 0x3F DUP1 PUSH1 0x2A PUSH1 0x0 CODECOPY PUSH1 0x0 RETURN INVALID PUSH1 0x80 PUSH1 0x40 MSTORE PUSH1 0x0 DUP1 REVERT INVALID LOG2 PUSH5 0x6970667358 0x22 SLT KECCAK256 0x24 SLT 0xA9 LOG2 0xC1 0xB6 0xC9 PUSH31 0x13045845C09B4F401E9B3BF376F525C8F769585C68FA332464736F6C634300 MOD MOD STOP CALLER ",
+                        "sourceMap": "26:123:0:-:0;;;76:1;48:29;;89:55;5:9:-1;2:2;;;27:1;24;17:12;2:2;-1:-1;123:9:0;:11;;;;;;26:123;;;;;;"
+                    },
+                    "deployedBytecode": {
+                        "immutableReferences": {},
+                        "linkReferences": {},
+                        "object": "6080604052600080fdfea26469706673582212202412a9a2c1b6c97e13045845c09b4f401e9b3bf376f525c8f769585c68fa332464736f6c63430006060033",
+                        "opcodes": "PUSH1 0x80 PUSH1 0x40 MSTORE PUSH1 0x0 DUP1 REVERT INVALID LOG2 PUSH5 0x6970667358 0x22 SLT KECCAK256 0x24 SLT 0xA9 LOG2 0xC1 0xB6 0xC9 PUSH31 0x13045845C09B4F401E9B3BF376F525C8F769585C68FA332464736F6C634300 MOD MOD STOP CALLER ",
+                        "sourceMap": "26:123:0:-:0;;;12:1:-1;9;2:12"
+                    },
+                    "gasEstimates": {
+                        "creation": {
+                            "codeDepositCost": "12600",
+                            "executionCost": "25887",
+                            "totalCost": "38487"
+                        }
+                    },
+                    "methodIdentifiers": {}
+                },
+                "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"c:/Users/andyc/OneDrive/Desktop/Visual Studio Code/Nft_Deployment/Nft_deploy_main_test/contracts/test.sol\":\"test\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"c:/Users/andyc/OneDrive/Desktop/Visual Studio Code/Nft_Deployment/Nft_deploy_main_test/contracts/test.sol\":{\"keccak256\":\"0xc0fd6f3f4192ec94d8a46a96919d4a93afd703a88fd743109fb1437b1233745b\",\"urls\":[\"bzz-raw://42892ed482b8c4d58a52ee25766cfe0ac26c7627f11109fd70077943127709b9\",\"dweb:/ipfs/QmNQnCVq3WAPzz1t9qCxkugANyP4mjxeiBsgJAmCh6Yq5p\"]}},\"version\":1}",
+                "storageLayout": {
+                    "storage": [
+                        {
+                            "astId": 4,
+                            "contract": "c:/Users/andyc/OneDrive/Desktop/Visual Studio Code/Nft_Deployment/Nft_deploy_main_test/contracts/test.sol:test",
+                            "label": "nb_shares",
+                            "offset": 0,
+                            "slot": "0",
+                            "type": "t_uint256"
+                        }
+                    ],
+                    "types": {
+                        "t_uint256": {
+                            "encoding": "inplace",
+                            "label": "uint256",
+                            "numberOfBytes": "32"
+                        }
+                    }
+                },
+                "userdoc": {
+                    "methods": {}
+                }
+            }
+        }
+    },
+    "sources": {
+        "c:/Users/andyc/OneDrive/Desktop/Visual Studio Code/Nft_Deployment/Nft_deploy_main_test/contracts/test.sol": {
+            "ast": {
+                "absolutePath": "c:/Users/andyc/OneDrive/Desktop/Visual Studio Code/Nft_Deployment/Nft_deploy_main_test/contracts/test.sol",
+                "exportedSymbols": {
+                    "test": [
+                        12
+                    ]
+                },
+                "id": 13,
+                "nodeType": "SourceUnit",
+                "nodes": [
+                    {
+                        "id": 1,
+                        "literals": [
+                            "solidity",
+                            "0.6",
+                            ".6"
+                        ],
+                        "nodeType": "PragmaDirective",
+                        "src": "0:22:0"
+                    },
+                    {
+                        "abstract": false,
+                        "baseContracts": [],
+                        "contractDependencies": [],
+                        "contractKind": "contract",
+                        "documentation": null,
+                        "fullyImplemented": true,
+                        "id": 12,
+                        "linearizedBaseContracts": [
+                            12
+                        ],
+                        "name": "test",
+                        "nodeType": "ContractDefinition",
+                        "nodes": [
+                            {
+                                "constant": false,
+                                "id": 4,
+                                "mutability": "mutable",
+                                "name": "nb_shares",
+                                "nodeType": "VariableDeclaration",
+                                "overrides": null,
+                                "scope": 12,
+                                "src": "48:29:0",
+                                "stateVariable": true,
+                                "storageLocation": "default",
+                                "typeDescriptions": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                },
+                                "typeName": {
+                                    "id": 2,
+                                    "name": "uint256",
+                                    "nodeType": "ElementaryTypeName",
+                                    "src": "48:7:0",
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_uint256",
+                                        "typeString": "uint256"
+                                    }
+                                },
+                                "value": {
+                                    "argumentTypes": null,
+                                    "hexValue": "30",
+                                    "id": 3,
+                                    "isConstant": false,
+                                    "isLValue": false,
+                                    "isPure": true,
+                                    "kind": "number",
+                                    "lValueRequested": false,
+                                    "nodeType": "Literal",
+                                    "src": "76:1:0",
+                                    "subdenomination": null,
+                                    "typeDescriptions": {
+                                        "typeIdentifier": "t_rational_0_by_1",
+                                        "typeString": "int_const 0"
+                                    },
+                                    "value": "0"
+                                },
+                                "visibility": "private"
+                            },
+                            {
+                                "body": {
+                                    "id": 10,
+                                    "nodeType": "Block",
+                                    "src": "111:33:0",
+                                    "statements": [
+                                        {
+                                            "expression": {
+                                                "argumentTypes": null,
+                                                "id": 8,
+                                                "isConstant": false,
+                                                "isLValue": false,
+                                                "isPure": false,
+                                                "lValueRequested": false,
+                                                "nodeType": "UnaryOperation",
+                                                "operator": "++",
+                                                "prefix": false,
+                                                "src": "123:11:0",
+                                                "subExpression": {
+                                                    "argumentTypes": null,
+                                                    "id": 7,
+                                                    "name": "nb_shares",
+                                                    "nodeType": "Identifier",
+                                                    "overloadedDeclarations": [],
+                                                    "referencedDeclaration": 4,
+                                                    "src": "123:9:0",
+                                                    "typeDescriptions": {
+                                                        "typeIdentifier": "t_uint256",
+                                                        "typeString": "uint256"
+                                                    }
+                                                },
+                                                "typeDescriptions": {
+                                                    "typeIdentifier": "t_uint256",
+                                                    "typeString": "uint256"
+                                                }
+                                            },
+                                            "id": 9,
+                                            "nodeType": "ExpressionStatement",
+                                            "src": "123:11:0"
+                                        }
+                                    ]
+                                },
+                                "documentation": null,
+                                "id": 11,
+                                "implemented": true,
+                                "kind": "constructor",
+                                "modifiers": [],
+                                "name": "",
+                                "nodeType": "FunctionDefinition",
+                                "overrides": null,
+                                "parameters": {
+                                    "id": 5,
+                                    "nodeType": "ParameterList",
+                                    "parameters": [],
+                                    "src": "101:2:0"
+                                },
+                                "returnParameters": {
+                                    "id": 6,
+                                    "nodeType": "ParameterList",
+                                    "parameters": [],
+                                    "src": "111:0:0"
+                                },
+                                "scope": 12,
+                                "src": "89:55:0",
+                                "stateMutability": "nonpayable",
+                                "virtual": false,
+                                "visibility": "public"
+                            }
+                        ],
+                        "scope": 13,
+                        "src": "26:123:0"
+                    }
+                ],
+                "src": "0:149:0"
+            },
+            "id": 0
+        }
+    }
+}

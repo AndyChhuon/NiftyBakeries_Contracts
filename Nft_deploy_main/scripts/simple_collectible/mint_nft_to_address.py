@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+#Script creates 5 nfts at select contract address and eth address
+
 from brownie import Nft_Collectible_Contract, accounts, network, config
 from scripts.helpful_scripts import OPENSEA_FORMAT
 

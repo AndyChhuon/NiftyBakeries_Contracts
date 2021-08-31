@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+#Script changes uri of any nft
+
 from brownie import Nft_Collectible_Contract, accounts, network, config
 from scripts.helpful_scripts import OPENSEA_FORMAT
 
