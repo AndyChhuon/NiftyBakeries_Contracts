@@ -12,8 +12,10 @@ contract Nft_Collectible_Contract is ERC721 {
     uint public tokenCounter;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     address private _owner;
-    uint256 private max_tokens = 100;
-    string public basicURI = 'https://gateway.pinata.cloud/ipfs/QmaKps84bUPFX4sxWhT5b7HrdgYtRmzH7AxvHR6HT6D7tV/JSON/json';
+    uint256 private max_tokens = 100; ///Change when deploying
+    string public basicURI = 'https://gateway.pinata.cloud/ipfs/QmaKps84bUPFX4sxWhT5b7HrdgYtRmzH7AxvHR6HT6D7tV/JSON/json'; ///Change when deploying 
+    string public godURI = 'https://gateway.pinata.cloud/ipfs/Qmdz9Y9QXUj5kSMPPCFDx5pzA1JKLyReSDYLr8iRjenPVq/Musk_test_JSON/json'; ///Change when deploying
+    string public chosenURI;
     string public tokenURI;
     uint public nb_shares =0;
 
@@ -23,10 +25,15 @@ contract Nft_Collectible_Contract is ERC721 {
         _setOwner(msg.sender);
     }
 
-    function findtokenURI(uint _optionId) private returns (string memory) {
-        return tokenURI = string(abi.encodePacked(basicURI,Strings.toString(_optionId)));
+    function findtokenURI(uint _optionId) private returns (string memory) { ///don't forget to change chances
+        if (random(_optionId)%2 == 0) {
+            chosenURI = godURI;
+        }else {
+            chosenURI = basicURI;
+        }
+        return tokenURI = string(abi.encodePacked(chosenURI,Strings.toString(_optionId)));
     }
-    
+
 
     function create_an_nft(uint256 amount) public {
         require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
