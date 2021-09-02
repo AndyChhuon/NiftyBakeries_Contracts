@@ -18,6 +18,15 @@ contract Nft_Collectible_Contract is ERC721 {
     string public chosenURI;
     string public tokenURI;
     uint public nb_shares =0;
+    uint256 public price1 = 1; ///Change when deploying
+    uint256 public price2 = 2;
+    uint256 public price3 = 3;
+    uint256 public max_price1 = 5;
+    uint256 public max_price2 = 10;
+    uint256 public price; ///test purposes, change
+
+
+
 
 
     constructor () public ERC721 ("Picasso_Musks", "MUSK"){
@@ -34,8 +43,47 @@ contract Nft_Collectible_Contract is ERC721 {
         return tokenURI = string(abi.encodePacked(chosenURI,Strings.toString(_optionId)));
     }
 
+    function random(uint randnum) public view returns (uint256) {
+        return uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, randnum)));
+    }
 
-    function create_an_nft(uint256 amount) public {
+
+    function create_an_nft(uint256 amount) public payable {
+
+    uint256 price =1;
+    
+    ///Comment Block allows to set exact price for each nft (not implemented because adds to gas fees)
+/*      
+        uint256 price = 0;
+        uint256 amountleft = amount;
+        uint256 temptokenCounter = tokenCounter;
+        ///max_price1 =5 (at this token id, change price);
+        ///max_price2 =10 ;
+        while(amountleft!=0){
+            if (temptokenCounter<max_price1){ ///Same Price until tokenid 4 (including 4)
+                if (temptokenCounter + amountleft <= max_price1){
+                    price = price+(amountleft*price1);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price1){ ///Same price until tokenid 4 and move on to while loop
+                    price = price + (max_price1-temptokenCounter)*price1;
+                    amountleft = amountleft-(max_price1-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price1-temptokenCounter);
+                }
+            }else if (temptokenCounter<max_price2 && temptokenCounter>=max_price1){
+                if (temptokenCounter + amountleft <= max_price2){
+                    price = price+(amountleft*price2);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price2){
+                    price = price + (max_price2-temptokenCounter)*price2;
+                    amountleft = amountleft-(max_price2-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price2-temptokenCounter);
+                }
+            }
+        }
+    */ 
+
+
+        require(msg.value >= price, "Not enough sent");
         require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
         for (uint256 i = 0; i<amount; i++){
             uint newItemId = tokenCounter;
@@ -46,6 +94,7 @@ contract Nft_Collectible_Contract is ERC721 {
         }
     }
 
+
     function create_nft_at_address (uint256 amount, address receiver) public onlyOwner {
         require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
         for (uint256 i = 0; i<amount; i++){
@@ -55,6 +104,36 @@ contract Nft_Collectible_Contract is ERC721 {
             tokenCounter = tokenCounter + 1;
             nb_shares++;
 
+        }
+    }
+
+    function return_price(uint256 amount) public returns (uint256){ ///Test purposes, change
+        price = 0;
+        uint256 amountleft = amount;
+        uint256 temptokenCounter = tokenCounter;
+
+        ///max_price1 =5;
+        ///max_price2 =10;
+        while(amountleft!=0){
+            if (temptokenCounter<max_price1){
+                if (temptokenCounter + amountleft <= max_price1){
+                    price = price+(amountleft*price1);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price1){
+                    price = price + (max_price1-temptokenCounter)*price1;
+                    amountleft = amountleft-(max_price1-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price1-temptokenCounter);
+                }
+            }else if (temptokenCounter<max_price2 && temptokenCounter>=max_price1){
+                if (temptokenCounter + amountleft <= max_price2){
+                    price = price+(amountleft*price2);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price2){
+                    price = price + (max_price2-temptokenCounter)*price2;
+                    amountleft = amountleft-(max_price2-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price2-temptokenCounter);
+                }
+            }
         }
     }
 
