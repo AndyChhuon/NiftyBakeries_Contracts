@@ -33,9 +33,16 @@ contract Nft_Collectible_Contract is ERC721 {
     uint256 public max_price6 = 13;
     uint256 public max_price7 = 15;
     uint256 public price;
+    uint256 public current_balance;
+    uint256 public last_split;
+    uint256 public total_split;
+    uint256 public base_split;
+    bool locked = false; ///re-entracy guard
+
 
     //Mapping for shares for separation of profit
     mapping (uint256 => uint256) public _equity;
+
 
     
 
@@ -45,9 +52,29 @@ contract Nft_Collectible_Contract is ERC721 {
 
     constructor () public ERC721 ("Picasso_Musks", "MUSK"){
         tokenCounter = 0;
+        last_split=0;
+        base_split=0;
         _setOwner(msg.sender);
     }
 
+    function split_balance() public {
+        require(!locked, "Reentrant call detected!"); ///Prevent reentracy from Owner
+        locked = true;
+        current_balance =address(this).balance; /// Divide by 1000000000000000 Round balance to 0.001 eth. ie 0.3123 eth gives 312. 
+        (bool success, ) = _owner.call{value:((current_balance-last_split)*7/10)}("");
+        require(success, "Transfer failed.");
+
+
+        total_split=(current_balance-last_split)*3/10; ///Find balance minus unclaimed balance from last split. And split 30% to nft holders.
+        last_split=address(this).balance;
+
+        base_split=base_split+(total_split/nb_shares); ///Gives amount of gwei per share since creation of contract(allows to bypass having to map 10000 balances when splitting)
+        locked = false;
+    }
+
+    function withdraw_balance() public {
+
+    }
 
     function findtokenURI(uint _optionId) private returns (string memory) { ///don't forget to change chances
         if (random(_optionId)%2 == 0) {
