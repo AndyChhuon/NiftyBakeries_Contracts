@@ -18,12 +18,26 @@ contract Nft_Collectible_Contract is ERC721 {
     string public chosenURI;
     string public tokenURI;
     uint public nb_shares =0;
-    uint256 public price1 = 1; ///Change when deploying
-    uint256 public price2 = 2;
-    uint256 public price3 = 3;
-    uint256 public max_price1 = 5;
-    uint256 public max_price2 = 10;
-    uint256 public price; ///test purposes, change
+    uint256 public price1 = 0.01 ether; ///Deployed onto BSC, so ether means BNB (not ETH)
+    uint256 public price2 = 0.02 ether;
+    uint256 public price3 = 0.03 ether;
+    uint256 public price4 = 0.04 ether;
+    uint256 public price5 = 0.05 ether;
+    uint256 public price6 = 0.06 ether;
+    uint256 public price7 = 0.07 ether;
+    uint256 public max_price1 = 3; ///(at this token id, change price). Same price until max-1
+    uint256 public max_price2 = 5;
+    uint256 public max_price3 = 7;
+    uint256 public max_price4 = 9;
+    uint256 public max_price5 = 11;
+    uint256 public max_price6 = 13;
+    uint256 public max_price7 = 15;
+    uint256 public price;
+
+    //Mapping for shares for separation of profit
+    mapping (uint256 => uint256) public _equity;
+
+    
 
 
 
@@ -34,11 +48,16 @@ contract Nft_Collectible_Contract is ERC721 {
         _setOwner(msg.sender);
     }
 
+
     function findtokenURI(uint _optionId) private returns (string memory) { ///don't forget to change chances
         if (random(_optionId)%2 == 0) {
             chosenURI = godURI;
+            _equity[_optionId] = 100; ///If God, set initial equity to 100
+            nb_shares+=100;
         }else {
             chosenURI = basicURI;
+            _equity[_optionId] = 1;
+            nb_shares++;
         }
         return tokenURI = string(abi.encodePacked(chosenURI,Strings.toString(_optionId)));
     }
@@ -47,14 +66,10 @@ contract Nft_Collectible_Contract is ERC721 {
         return uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, randnum)));
     }
 
-
     function create_an_nft(uint256 amount) public payable {
-
-    uint256 price =1;
     
-    ///Comment Block allows to set exact price for each nft (not implemented because adds to gas fees)
-/*      
-        uint256 price = 0;
+  
+        price = 0;
         uint256 amountleft = amount;
         uint256 temptokenCounter = tokenCounter;
         ///max_price1 =5 (at this token id, change price);
@@ -78,19 +93,62 @@ contract Nft_Collectible_Contract is ERC721 {
                     amountleft = amountleft-(max_price2-temptokenCounter);
                     temptokenCounter= temptokenCounter + (max_price2-temptokenCounter);
                 }
+            }else if (temptokenCounter<max_price3 && temptokenCounter>=max_price2){
+                if (temptokenCounter + amountleft <= max_price3){
+                    price = price+(amountleft*price3);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price3){
+                    price = price + (max_price3-temptokenCounter)*price3;
+                    amountleft = amountleft-(max_price3-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price3-temptokenCounter);
+                }
+            }else if (temptokenCounter<max_price4 && temptokenCounter>=max_price3){
+                if (temptokenCounter + amountleft <= max_price4){
+                    price = price+(amountleft*price4);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price4){
+                    price = price + (max_price4-temptokenCounter)*price4;
+                    amountleft = amountleft-(max_price4-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price4-temptokenCounter);
+                }
+            }else if (temptokenCounter<max_price5 && temptokenCounter>=max_price4){
+                if (temptokenCounter + amountleft <= max_price5){
+                    price = price+(amountleft*price5);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price5){
+                    price = price + (max_price5-temptokenCounter)*price5;
+                    amountleft = amountleft-(max_price5-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price5-temptokenCounter);
+                }
+            }else if (temptokenCounter<max_price6 && temptokenCounter>=max_price5){
+                if (temptokenCounter + amountleft <= max_price6){
+                    price = price+(amountleft*price6);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price6){
+                    price = price + (max_price6-temptokenCounter)*price6;
+                    amountleft = amountleft-(max_price6-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price6-temptokenCounter);
+                }
+            }else if (temptokenCounter<max_price7 && temptokenCounter>=max_price6){
+                if (temptokenCounter + amountleft <= max_price7){
+                    price = price+(amountleft*price7);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price7){
+                    price = price + (max_price7-temptokenCounter)*price7;
+                    amountleft = amountleft-(max_price7-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price7-temptokenCounter);
+                }
             }
+            
         }
-    */ 
 
-
-        require(msg.value >= price, "Not enough sent");
         require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
+        require(msg.value >= price, "Not enough sent");
         for (uint256 i = 0; i<amount; i++){
             uint newItemId = tokenCounter;
             _safeMint(msg.sender, newItemId);
             _setTokenURI(newItemId, findtokenURI(newItemId));
             tokenCounter = tokenCounter + 1;
-            nb_shares++;
         }
     }
 
@@ -102,24 +160,23 @@ contract Nft_Collectible_Contract is ERC721 {
             _safeMint(receiver, newItemId);
             _setTokenURI(newItemId, findtokenURI(newItemId));
             tokenCounter = tokenCounter + 1;
-            nb_shares++;
 
         }
     }
 
-    function return_price(uint256 amount) public returns (uint256){ ///Test purposes, change
+    function return_price(uint256 amount) public returns (uint256){ ///Test purposes, remove
+  
         price = 0;
         uint256 amountleft = amount;
         uint256 temptokenCounter = tokenCounter;
-
-        ///max_price1 =5;
-        ///max_price2 =10;
+        ///max_price1 =5 (at this token id, change price);
+        ///max_price2 =10 ;
         while(amountleft!=0){
-            if (temptokenCounter<max_price1){
+            if (temptokenCounter<max_price1){ ///Same Price until tokenid 4 (including 4)
                 if (temptokenCounter + amountleft <= max_price1){
                     price = price+(amountleft*price1);
                     amountleft =0;
-                }else if (temptokenCounter + amountleft > max_price1){
+                }else if (temptokenCounter + amountleft > max_price1){ ///Same price until tokenid 4 and move on to while loop
                     price = price + (max_price1-temptokenCounter)*price1;
                     amountleft = amountleft-(max_price1-temptokenCounter);
                     temptokenCounter= temptokenCounter + (max_price1-temptokenCounter);
@@ -133,8 +190,55 @@ contract Nft_Collectible_Contract is ERC721 {
                     amountleft = amountleft-(max_price2-temptokenCounter);
                     temptokenCounter= temptokenCounter + (max_price2-temptokenCounter);
                 }
+            }else if (temptokenCounter<max_price3 && temptokenCounter>=max_price2){
+                if (temptokenCounter + amountleft <= max_price3){
+                    price = price+(amountleft*price3);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price3){
+                    price = price + (max_price3-temptokenCounter)*price3;
+                    amountleft = amountleft-(max_price3-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price3-temptokenCounter);
+                }
+            }else if (temptokenCounter<max_price4 && temptokenCounter>=max_price3){
+                if (temptokenCounter + amountleft <= max_price4){
+                    price = price+(amountleft*price4);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price4){
+                    price = price + (max_price4-temptokenCounter)*price4;
+                    amountleft = amountleft-(max_price4-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price4-temptokenCounter);
+                }
+            }else if (temptokenCounter<max_price5 && temptokenCounter>=max_price4){
+                if (temptokenCounter + amountleft <= max_price5){
+                    price = price+(amountleft*price5);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price5){
+                    price = price + (max_price5-temptokenCounter)*price5;
+                    amountleft = amountleft-(max_price5-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price5-temptokenCounter);
+                }
+            }else if (temptokenCounter<max_price6 && temptokenCounter>=max_price5){
+                if (temptokenCounter + amountleft <= max_price6){
+                    price = price+(amountleft*price6);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price6){
+                    price = price + (max_price6-temptokenCounter)*price6;
+                    amountleft = amountleft-(max_price6-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price6-temptokenCounter);
+                }
+            }else if (temptokenCounter<max_price7 && temptokenCounter>=max_price6){
+                if (temptokenCounter + amountleft <= max_price7){
+                    price = price+(amountleft*price7);
+                    amountleft =0;
+                }else if (temptokenCounter + amountleft > max_price7){
+                    price = price + (max_price7-temptokenCounter)*price7;
+                    amountleft = amountleft-(max_price7-temptokenCounter);
+                    temptokenCounter= temptokenCounter + (max_price7-temptokenCounter);
+                }
             }
+            
         }
+
     }
 
     

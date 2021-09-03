@@ -53,7 +53,8 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
     // Base URI
     string private _baseURI;
 
-
+    //Mapping for shares for separation of profit
+    mapping (uint256 => uint256) private _equity;
 
 
 
@@ -112,7 +113,6 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
         return _holderTokens[owner].length();
     }
 
-
     /**
      * @dev See {IERC721-ownerOf}.
      */
@@ -125,6 +125,14 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
      */
     function name() public view virtual override returns (string memory) {
         return _name;
+    }
+
+     /**
+     * Temporary..
+     */
+
+    function return_equity(uint256 tokenId) public view virtual override returns (uint256){
+        return _equity[tokenId];
     }
 
 
@@ -346,6 +354,9 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable 
         _holderTokens[to].add(tokenId);
 
         _tokenOwners.set(tokenId, to);
+
+        _equity[tokenId] = 1;
+
 
         emit Transfer(address(0), to, tokenId);
     }

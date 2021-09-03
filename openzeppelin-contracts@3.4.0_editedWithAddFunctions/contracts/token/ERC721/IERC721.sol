@@ -29,7 +29,6 @@ interface IERC721 is IERC165 {
     function balanceOf(address owner) external view returns (uint256 balance);
 
     
-    function return_equity(uint256 tokenId) external view returns(uint256 equity);
 
 
 
