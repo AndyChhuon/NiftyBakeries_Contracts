@@ -36,13 +36,18 @@ contract Nft_Collectible_Contract is ERC721 {
     uint256 public current_balance;
     uint256 public last_split;
     uint256 public total_split;
-    uint256 public base_split;
+    uint256 public current_split;
+    uint256[] public base_split;
+    uint256[] public _equity;
+    uint256[] public last_split_id;
+
+
     bool locked = false; ///re-entracy guard
 
 
     //Mapping for shares for separation of profit
-    mapping (uint256 => uint256) public _equity;
-
+    uint256 public _test;
+    mapping(uint256 => uint256[]) public equity_split;
 
     
 
@@ -53,7 +58,7 @@ contract Nft_Collectible_Contract is ERC721 {
     constructor () public ERC721 ("Picasso_Musks", "MUSK"){
         tokenCounter = 0;
         last_split=0;
-        base_split=0;
+        current_split=0;
         _setOwner(msg.sender);
     }
 
@@ -66,9 +71,11 @@ contract Nft_Collectible_Contract is ERC721 {
 
 
         total_split=(current_balance-last_split)*3/10; ///Find balance minus unclaimed balance from last split. And split 30% to nft holders.
-        last_split=address(this).balance;
+        last_split=address(this).balance; 
 
-        base_split=base_split+(total_split/nb_shares); ///Gives amount of gwei per share since creation of contract(allows to bypass having to map 10000 balances when splitting)
+        
+        equity_split[current_split] = _equity; ///Assigns equity array to equity_split mapping for current split
+        base_split[current_split]=total_split/nb_shares; ///Gives amount of gwei per share for current split
         locked = false;
     }
 
@@ -76,14 +83,24 @@ contract Nft_Collectible_Contract is ERC721 {
 
     }
 
+    function assign_equity() public{ ///Gets number of shares for token id at split
+        equity_split[0] = _equity;
+        _test=equity_split[0][1]; ///Get equity of tokenid
+    }
+
+    function _test_() public{
+        _equity[0] = 32132; ///Change equity to tokenid
+    }
+
+
     function findtokenURI(uint _optionId) private returns (string memory) { ///don't forget to change chances
         if (random(_optionId)%2 == 0) {
             chosenURI = godURI;
-            _equity[_optionId] = 100; ///If God, set initial equity to 100
+            _equity.push(100); ///If God, set initial equity to 100
             nb_shares+=100;
         }else {
             chosenURI = basicURI;
-            _equity[_optionId] = 1;
+            _equity.push(1);
             nb_shares++;
         }
         return tokenURI = string(abi.encodePacked(chosenURI,Strings.toString(_optionId)));
