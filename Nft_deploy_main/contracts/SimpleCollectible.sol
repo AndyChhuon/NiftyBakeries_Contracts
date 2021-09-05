@@ -37,17 +37,19 @@ contract Nft_Collectible_Contract is ERC721 {
     uint256 public last_split;
     uint256 public total_split;
     uint256 public current_split;
-    uint256[] public base_split;
+
     uint256[] public _equity;
-    uint256[] public last_split_id;
 
 
     bool locked = false; ///re-entracy guard
 
 
     //Mapping for shares for separation of profit
-    uint256 public _test;
-    mapping(uint256 => uint256[]) public equity_split;
+
+    mapping(uint256 => uint256[]) public equity_split; ///Split number to equity array 
+    mapping(uint256 => uint256) public base_split; ///Split number to gwei per share for split
+    mapping (uint256 => uint256) public split_id; ///Current split number for certain tokenid
+
 
     
 
@@ -76,20 +78,37 @@ contract Nft_Collectible_Contract is ERC721 {
         
         equity_split[current_split] = _equity; ///Assigns equity array to equity_split mapping for current split
         base_split[current_split]=total_split/nb_shares; ///Gives amount of gwei per share for current split
+        current_split++;
         locked = false;
     }
 
     function withdraw_balance() public {
+        require(!locked, "Reentrant call detected!"); ///Prevent reentracy
+        locked = true;
+        uint256 balance_to_withdraw =0;
+        for(uint256 i=0; i<balanceOf(msg.sender); i++){
+            uint256 id_token = tokenOfOwnerByIndex(msg.sender,i);
+            while (split_id[id_token] < current_split) {
+                if (id_token < equity_split[split_id[id_token]].length){
+                    balance_to_withdraw += (equity_split[split_id[id_token]][id_token])*base_split[split_id[id_token]];
+                    split_id[id_token] ++;
+                }
+                else{
+                    split_id[id_token] ++;
 
+                }
+            }
+
+        }
+        (bool success, ) = msg.sender.call{value:balance_to_withdraw}("");
+        require(success, "Transfer failed.");
+        last_split= last_split - balance_to_withdraw;
+        locked = false;
     }
 
-    function assign_equity() public{ ///Gets number of shares for token id at split
-        equity_split[0] = _equity;
-        _test=equity_split[0][1]; ///Get equity of tokenid
-    }
-
-    function _test_() public{
-        _equity[0] = 32132; ///Change equity to tokenid
+    function add_equity(uint256 tokenId, uint256 incrementation) public onlyOwner{
+        _equity[tokenId] = _equity[tokenId]+incrementation; ///Change equity to tokenid
+        nb_shares+=incrementation;
     }
 
 
