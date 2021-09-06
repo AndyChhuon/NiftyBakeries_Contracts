@@ -74,7 +74,7 @@ contract Nft_Collectible_Contract is ERC721 {
         require(block.timestamp >= split_time + 7 days, "Not enough time elapsed since last split");
         require(!locked, "Reentrant call detected!"); ///Prevent reentracy from Owner
         locked = true;
-        current_balance =address(this).balance; /// Divide by 1000000000000000 Round balance to 0.001 eth. ie 0.3123 eth gives 312. 
+        current_balance =address(this).balance; 
         (bool success, ) = _owner.call{value:((current_balance-last_split)*7/10)}("");
         require(success, "Transfer failed.");
 
@@ -233,86 +233,7 @@ contract Nft_Collectible_Contract is ERC721 {
             tokenCounter = tokenCounter + 1;
 
         }
-    }
-
-    function return_price(uint256 amount) public returns (uint256){ ///Test purposes, remove
-  
-        price = 0;
-        uint256 amountleft = amount;
-        uint256 temptokenCounter = tokenCounter;
-        ///max_price1 =5 (at this token id, change price);
-        ///max_price2 =10 ;
-        while(amountleft!=0){
-            if (temptokenCounter<max_price1){ ///Same Price until tokenid 4 (including 4)
-                if (temptokenCounter + amountleft <= max_price1){
-                    price = price+(amountleft*price1);
-                    amountleft =0;
-                }else if (temptokenCounter + amountleft > max_price1){ ///Same price until tokenid 4 and move on to while loop
-                    price = price + (max_price1-temptokenCounter)*price1;
-                    amountleft = amountleft-(max_price1-temptokenCounter);
-                    temptokenCounter= temptokenCounter + (max_price1-temptokenCounter);
-                }
-            }else if (temptokenCounter<max_price2 && temptokenCounter>=max_price1){
-                if (temptokenCounter + amountleft <= max_price2){
-                    price = price+(amountleft*price2);
-                    amountleft =0;
-                }else if (temptokenCounter + amountleft > max_price2){
-                    price = price + (max_price2-temptokenCounter)*price2;
-                    amountleft = amountleft-(max_price2-temptokenCounter);
-                    temptokenCounter= temptokenCounter + (max_price2-temptokenCounter);
-                }
-            }else if (temptokenCounter<max_price3 && temptokenCounter>=max_price2){
-                if (temptokenCounter + amountleft <= max_price3){
-                    price = price+(amountleft*price3);
-                    amountleft =0;
-                }else if (temptokenCounter + amountleft > max_price3){
-                    price = price + (max_price3-temptokenCounter)*price3;
-                    amountleft = amountleft-(max_price3-temptokenCounter);
-                    temptokenCounter= temptokenCounter + (max_price3-temptokenCounter);
-                }
-            }else if (temptokenCounter<max_price4 && temptokenCounter>=max_price3){
-                if (temptokenCounter + amountleft <= max_price4){
-                    price = price+(amountleft*price4);
-                    amountleft =0;
-                }else if (temptokenCounter + amountleft > max_price4){
-                    price = price + (max_price4-temptokenCounter)*price4;
-                    amountleft = amountleft-(max_price4-temptokenCounter);
-                    temptokenCounter= temptokenCounter + (max_price4-temptokenCounter);
-                }
-            }else if (temptokenCounter<max_price5 && temptokenCounter>=max_price4){
-                if (temptokenCounter + amountleft <= max_price5){
-                    price = price+(amountleft*price5);
-                    amountleft =0;
-                }else if (temptokenCounter + amountleft > max_price5){
-                    price = price + (max_price5-temptokenCounter)*price5;
-                    amountleft = amountleft-(max_price5-temptokenCounter);
-                    temptokenCounter= temptokenCounter + (max_price5-temptokenCounter);
-                }
-            }else if (temptokenCounter<max_price6 && temptokenCounter>=max_price5){
-                if (temptokenCounter + amountleft <= max_price6){
-                    price = price+(amountleft*price6);
-                    amountleft =0;
-                }else if (temptokenCounter + amountleft > max_price6){
-                    price = price + (max_price6-temptokenCounter)*price6;
-                    amountleft = amountleft-(max_price6-temptokenCounter);
-                    temptokenCounter= temptokenCounter + (max_price6-temptokenCounter);
-                }
-            }else if (temptokenCounter<max_price7 && temptokenCounter>=max_price6){
-                if (temptokenCounter + amountleft <= max_price7){
-                    price = price+(amountleft*price7);
-                    amountleft =0;
-                }else if (temptokenCounter + amountleft > max_price7){
-                    price = price + (max_price7-temptokenCounter)*price7;
-                    amountleft = amountleft-(max_price7-temptokenCounter);
-                    temptokenCounter= temptokenCounter + (max_price7-temptokenCounter);
-                }
-            }
-            
-        }
-
-    }
-
-    
+    }    
 
     function update_token_uri(uint256 ItemId, string memory token_Uri) public onlyOwner{
         _setTokenURI(ItemId, token_Uri);
