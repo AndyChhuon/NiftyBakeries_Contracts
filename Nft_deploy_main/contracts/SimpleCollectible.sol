@@ -12,7 +12,7 @@ contract Nft_Collectible_Contract is ERC721 {
     uint public tokenCounter;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     address private _owner;
-    uint256 private max_tokens = 100; ///Change when deploying
+    uint256 private max_tokens = 10000; ///Change when deploying
     string public basicURI = 'https://gateway.pinata.cloud/ipfs/QmaKps84bUPFX4sxWhT5b7HrdgYtRmzH7AxvHR6HT6D7tV/JSON/json'; ///Change when deploying 
     string public godURI = 'https://gateway.pinata.cloud/ipfs/Qmdz9Y9QXUj5kSMPPCFDx5pzA1JKLyReSDYLr8iRjenPVq/Musk_test_JSON/json'; ///Change when deploying
     string public chosenURI;
@@ -37,12 +37,14 @@ contract Nft_Collectible_Contract is ERC721 {
     uint256 public last_split;
     uint256 public total_split;
     uint256 public current_split;
+    uint256 public split_time;
 
     uint256[] public _equity;
 
 
     bool locked = false; ///re-entracy guard
 
+    ///Call tokenUri(tokenid) to get tokenuri (check ierc721 metadata)
 
     //Mapping for shares for separation of profit
 
@@ -61,10 +63,15 @@ contract Nft_Collectible_Contract is ERC721 {
         tokenCounter = 0;
         last_split=0;
         current_split=0;
+        split_time= block.timestamp;
         _setOwner(msg.sender);
     }
 
+    receive() payable external {
+  }
+
     function split_balance() public {
+        require(block.timestamp >= split_time + 7 days, "Not enough time elapsed since last split");
         require(!locked, "Reentrant call detected!"); ///Prevent reentracy from Owner
         locked = true;
         current_balance =address(this).balance; /// Divide by 1000000000000000 Round balance to 0.001 eth. ie 0.3123 eth gives 312. 
@@ -79,6 +86,7 @@ contract Nft_Collectible_Contract is ERC721 {
         equity_split[current_split] = _equity; ///Assigns equity array to equity_split mapping for current split
         base_split[current_split]=total_split/nb_shares; ///Gives amount of gwei per share for current split
         current_split++;
+        split_time = block.timestamp;
         locked = false;
     }
 

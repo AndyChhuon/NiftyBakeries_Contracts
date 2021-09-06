@@ -8,16 +8,12 @@ def main():
     dev = accounts.add(config["wallets"]["from_key"])
     print(network.show_active())
     simple_collectible = Nft_Collectible_Contract[len(Nft_Collectible_Contract) - 1]
-    test7= simple_collectible._equity(0)
-    print(test7)
-    test3= simple_collectible.nb_shares()
-    print(test3)
-    simple_collectible.add_equity(0,2,{"from": dev})
-    test2 = simple_collectible._equity(0)
+    test2= simple_collectible.base_split(1)
     print(test2)
-    test4= simple_collectible.nb_shares()
-    print(test4)
-
+    test1= simple_collectible.nb_shares()
+    print(test1)
+    test7= simple_collectible.balance()
+    print(test7)
 
 
 
