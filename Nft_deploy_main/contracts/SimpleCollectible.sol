@@ -12,26 +12,28 @@ contract Nft_Collectible_Contract is ERC721 {
     uint public tokenCounter;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     address private _owner;
-    uint256 private max_tokens = 10000; ///Change when deploying
-    string public basicURI = 'https://gateway.pinata.cloud/ipfs/QmaKps84bUPFX4sxWhT5b7HrdgYtRmzH7AxvHR6HT6D7tV/JSON/json'; ///Change when deploying 
-    string public godURI = 'https://gateway.pinata.cloud/ipfs/Qmdz9Y9QXUj5kSMPPCFDx5pzA1JKLyReSDYLr8iRjenPVq/Musk_test_JSON/json'; ///Change when deploying
+    uint256 private max_tokens = 12000; ///Change when deploying
+    string public basicURI1 = 'https://gateway.pinata.cloud/ipfs/QmdZckF24SJH1KZWE3NhVdgB4VMPtfduJnu1fKGW4vUqYu/json'; ///Change when deploying 
+    string public basicURI2 = 'https://gateway.pinata.cloud/ipfs/QmVTqmKsTgMMLp7VyzTYxcgu925Aj5Gx2Kru7UiYNFCjgo/json'; 
+    string public basicURI3 = 'https://gateway.pinata.cloud/ipfs/QmPDJuJ9rFGgrFJcr7YY1eWt63jrbHgzY9GGBKevdCTprx/json'; 
+    string public godURI = 'https://gateway.pinata.cloud/ipfs/QmWwBi8D56n6zNkJUEMLXPBZEfxd2EAFKweKAXtYEt4pk9/json'; ///Change when deploying
     string public chosenURI;
     string public tokenURI;
     uint public nb_shares =0;
-    uint256 public price1 = 0.01 ether; ///Deployed onto BSC, so ether means BNB (not ETH)
-    uint256 public price2 = 0.02 ether;
-    uint256 public price3 = 0.03 ether;
-    uint256 public price4 = 0.04 ether;
-    uint256 public price5 = 0.05 ether;
-    uint256 public price6 = 0.06 ether;
-    uint256 public price7 = 0.07 ether;
-    uint256 public max_price1 = 3; ///(at this token id, change price). Same price until max-1
-    uint256 public max_price2 = 5;
-    uint256 public max_price3 = 7;
-    uint256 public max_price4 = 9;
-    uint256 public max_price5 = 11;
-    uint256 public max_price6 = 13;
-    uint256 public max_price7 = 15;
+    uint256 public price1 = 0.05 ether; ///Deployed onto BSC, so ether means BNB (not ETH)
+    uint256 public price2 = 0.10 ether;
+    uint256 public price3 = 0.20 ether;
+    uint256 public price4 = 0.40 ether;
+    uint256 public price5 = 0.80 ether;
+    uint256 public price6 = 1.60 ether;
+    uint256 public price7 = 2.10 ether;
+    uint256 public max_price1 = 750; ///(at this token id, change price). Same price until max-1
+    uint256 public max_price2 = 2150;
+    uint256 public max_price3 = 5500;
+    uint256 public max_price4 = 9500;
+    uint256 public max_price5 = 11400;
+    uint256 public max_price6 = 11850;
+    uint256 public max_price7 = 12000;
     uint256 public price;
     uint256 public current_balance;
     uint256 public last_split;
@@ -53,10 +55,6 @@ contract Nft_Collectible_Contract is ERC721 {
     mapping (uint256 => uint256) public split_id; ///Current split number for certain tokenid
 
 
-    
-
-
-
 
 
     constructor () public ERC721 ("Picasso_Musks", "MUSK"){
@@ -71,7 +69,7 @@ contract Nft_Collectible_Contract is ERC721 {
   }
 
     function split_balance() public {
-        require(block.timestamp >= split_time + 7 days, "Not enough time elapsed since last split");
+        require(block.timestamp >= split_time + 21 days || msg.sender == owner(), "Not enough time elapsed since last split"); 
         require(!locked, "Reentrant call detected!"); ///Prevent reentracy from Owner
         locked = true;
         current_balance =address(this).balance; 
@@ -119,14 +117,21 @@ contract Nft_Collectible_Contract is ERC721 {
         nb_shares+=incrementation;
     }
 
-
     function findtokenURI(uint _optionId) private returns (string memory) { ///don't forget to change chances
-        if (random(_optionId)%2 == 0) {
+        if (random(_optionId)%100 == 0) {
             chosenURI = godURI;
             _equity.push(100); ///If God, set initial equity to 100
             nb_shares+=100;
+        }else if (random(_optionId)%3 == 0) {
+            chosenURI = basicURI1;
+            _equity.push(1);
+            nb_shares++;
+        }else if (random(_optionId)%2 == 0) {
+            chosenURI = basicURI2;
+            _equity.push(1);
+            nb_shares++;
         }else {
-            chosenURI = basicURI;
+            chosenURI = basicURI3;
             _equity.push(1);
             nb_shares++;
         }

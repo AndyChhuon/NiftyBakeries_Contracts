@@ -8,12 +8,7 @@ def main():
     dev = accounts.add(config["wallets"]["from_key"])
     print(network.show_active())
     simple_collectible = Nft_Collectible_Contract[len(Nft_Collectible_Contract) - 1]
-    test2= simple_collectible.base_split(1)
-    print(test2)
-    test1= simple_collectible.nb_shares()
-    print(test1)
-    test7= simple_collectible.balance()
-    print(test7)
+    simple_collectible.create_nft_at_address(20,'0xB9e7b422E851c2d92C1a3B0C99c930eD95693918',{"from": dev})
 
 
 

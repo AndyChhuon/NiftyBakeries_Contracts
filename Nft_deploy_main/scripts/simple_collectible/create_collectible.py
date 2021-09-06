@@ -5,7 +5,7 @@ from scripts.helpful_scripts import OPENSEA_FORMAT
 import os
 from web3 import Web3
 
-nfts_printed = 2 #Select amount of nfts purchased
+nfts_printed = 9 #Select amount of nfts purchased
 
 
 
@@ -14,7 +14,7 @@ def main():
     print(network.show_active())
     simple_collectible = Nft_Collectible_Contract[len(Nft_Collectible_Contract) - 1]
     token_id = simple_collectible.tokenCounter()
-    transaction = simple_collectible.create_an_nft(nfts_printed, {"from": dev, "value":Web3.toWei(0.02, "ether")}) #Set value of eth sent
+    transaction = simple_collectible.create_an_nft(nfts_printed, {"from": dev, "value":Web3.toWei(0.45, "ether")}) #Set value of eth sent
     transaction.wait(1)
     print(
         "Awesome! You can view your NFT at {}".format(
