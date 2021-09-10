@@ -8,11 +8,16 @@ def main():
     dev = accounts.add(config["wallets"]["from_key"])
     print(network.show_active())
     simple_collectible = Nft_Collectible_Contract[len(Nft_Collectible_Contract) - 1]
-    simple_collectible.create_nft_at_address(20,'0xB9e7b422E851c2d92C1a3B0C99c930eD95693918',{"from": dev})
+    #simple_collectible.approve('0xF513252c8852f341f784EDbB34c6Be661Cffc4fB',0,{"from": dev})
+    #simple_collectible.approve('0x9EFAd97a5Cb8C3d62f68f96Da52d04Ca62f3C36F',1,{"from": dev})
+    test = simple_collectible.ownerOf(2)
+    print(test)
 
 
 
 
+
+#0x42a70c389b989d35a02616E593A602043203E144
 
 
 

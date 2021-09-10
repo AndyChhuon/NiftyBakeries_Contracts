@@ -51,9 +51,9 @@ contract Nft_Collectible_Contract is ERC721 {
     //Mapping for shares for separation of profit
 
     mapping(uint256 => uint256[]) public equity_split; ///Split number to equity array 
-    mapping(uint256 => uint256) public base_split; ///Split number to gwei per share for split
+    mapping(uint256 => uint256) public base_split; ///Split number to Wei per share for split
     mapping (uint256 => uint256) public split_id; ///Current split number for certain tokenid
-
+    mapping (uint256 => uint256) public marketplace_nft_price;
 
 
 
@@ -67,6 +67,13 @@ contract Nft_Collectible_Contract is ERC721 {
 
     receive() payable external {
   }
+
+    function setnftPrice(uint256 tokenId, uint256 token_price, address to) public { ///token_price in BNB and approve escrow contract
+        require(msg.sender == ownerOf(tokenId), "You do not own this token");
+        marketplace_nft_price[tokenId] = token_price;
+        approve(to, tokenId);
+
+    }
 
     function split_balance() public {
         require(block.timestamp >= split_time + 21 days || msg.sender == owner(), "Not enough time elapsed since last split"); 
@@ -87,6 +94,7 @@ contract Nft_Collectible_Contract is ERC721 {
         split_time = block.timestamp;
         locked = false;
     }
+    
 
     function withdraw_balance() public {
         require(!locked, "Reentrant call detected!"); ///Prevent reentracy
