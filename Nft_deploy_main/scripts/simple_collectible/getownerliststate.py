@@ -8,9 +8,9 @@ def main():
     dev = accounts.add(config["wallets"]["from_key"])
     print(network.show_active())
     simple_collectible = Nft_Collectible_Contract[len(Nft_Collectible_Contract) - 1]
-    #simple_collectible.approve('0xF513252c8852f341f784EDbB34c6Be661Cffc4fB',0,{"from": dev})
+    simple_collectible.approve('0x7148E661C6bf5124a49c9aEc1C5338969C8B99B7',16,{"from": dev})
     #simple_collectible.approve('0x9EFAd97a5Cb8C3d62f68f96Da52d04Ca62f3C36F',1,{"from": dev})
-    test = simple_collectible.ownerOf(2)
+    test = simple_collectible.getApproved(16)
     print(test)
 
 

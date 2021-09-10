@@ -3,24 +3,47 @@ pragma solidity 0.6.6;
 
 contract marketplace{
 
-    string public test;
+    mapping (address => mapping(uint256 => uint256)) public nft_marketplace; ///nft_address, tokenid, price (in wei)
+    bool locked = false;
 
      constructor () public {
     }
 
-    function buyNft(address nft_address, address addressfrom, address addressto, uint256 tokenid) public { ///Use javascript to check approved() at button click before allowing this functions. If not this contract, remove from sql
-        (bool success, bytes memory returnData) = nft_address.call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256)",addressfrom,addressto,tokenid)); /* do not leave spaces between argumets*/
-        require(success, "failed");
+    function buyNft(address nft_address, address addressto, uint256 tokenid) public payable { ///Handle revert: https://ethereum.stackexchange.com/questions/80755/read-message-of-require-revert-statement-in-app-js
+        require(!locked, "Reentrant call detected!"); ///Prevent reentracy
+        locked = true;
+        
+        address addressfrom;
+        require(nft_marketplace[nft_address][tokenid] > 0, "Token not for sale");
+        require(msg.value >= nft_marketplace[nft_address][tokenid], "Not enough sent"); ///Require price (in wei)
 
+        
+        (bool success, bytes memory returnData) = nft_address.call(abi.encodeWithSignature("getApproved(uint256)",tokenid)); ///Check if contract has approval to transfer0
+        require(success, "failed");
+        require(address(this) == bytesToAddress(returnData), "Token was transferred or approval was removed");
+
+        (success, returnData) = nft_address.call(abi.encodeWithSignature("ownerOf(uint256)",tokenid)); ///Check if contract has approval to transfer0
+        require(success, "failed");
+        addressfrom= bytesToAddress(returnData);
+
+        (success, ) = addressfrom.call{value: (msg.value*92/100)}("");
+        require(success, "Transfer to seller failed.");
+
+        (success, ) = nft_address.call{value: (msg.value*8/100)}(""); ///Change for wider applications
+        require(success, "Transfer to nft contract owner failed.");
+
+
+        (success, ) = nft_address.call(abi.encodeWithSignature("safeTransferFrom(address,address,uint256)",addressfrom,addressto,tokenid)); /* do not leave spaces between argumets*/
+        require(success, "failed");
+        nft_marketplace[nft_address][tokenid] = 0;
+
+        locked = false;
     }
-    function setnftPrice(address nft_address, uint256 tokenId) public { ///approve in simplecollectible contract. If success (using web3): setnftprice
+    function setnftPrice(address nft_address, uint256 tokenId, uint256 price) public { ///Set to 0 to cancel listing
         (bool success, bytes memory returnData) = nft_address.call(abi.encodeWithSignature("ownerOf(uint256)",tokenId)); /* do not leave spaces between argumets*/
         require(success, "failed");
         require(msg.sender == bytesToAddress(returnData), "You are not the owner of this nft");
-        test = "yes";
- ///https://ethereum.stackexchange.com/questions/83043/can-anyone-explain-how-bytes-memory-can-be-converted-to-address-type-in-solidity (convert bytes to address)
-        ///string memory test = abi.decode(returnData,(string));
-
+        nft_marketplace[nft_address][tokenId]= price;
     }
 
     function bytesToAddress(bytes memory bys) public pure returns (address addr) {
@@ -31,6 +54,4 @@ contract marketplace{
     }
 
 
-
 }   
-///("safeTransferFrom(address, address, uint256) ", 0xB9e7b422E851c2d92C1a3B0C99c930eD95693918, 0xADaBD2626f07370BCbD297a55d8d3C1AaE73577c, 0));
