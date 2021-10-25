@@ -2,7 +2,7 @@
 
 
 import json
-PATH = r'C:\Users\andyc\OneDrive\Desktop\Visual Studio Code\Nft_Creator_Website\creator_contract_equity_abi.json'
+PATH = r'C:\Users\andyc\OneDrive\Desktop\Visual Studio Code\Nft_Creator_Website\Main_Root\creator_contract_equity_abi.json'
 
 
 def main():

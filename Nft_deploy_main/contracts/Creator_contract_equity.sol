@@ -36,7 +36,7 @@ contract Nft_Collectible_Contract_equity is ERC721 {
     uint256 public last_split;
     uint256 public total_split;
     uint256 public current_split;
-    uint256 public split_time;
+    uint256 public split_time=0;
     uint256 public nb_shares =0;
     bool public equity_differs = true;
 
@@ -183,6 +183,29 @@ contract Nft_Collectible_Contract_equity is ERC721 {
         locked = false;
     }
 
+    function check_balance() public view returns(uint256){
+        uint256 balance_to_withdraw =0;
+        for(uint256 i=0; i<balanceOf(msg.sender); i++){
+            uint256 id_token = tokenOfOwnerByIndex(msg.sender,i);
+            uint256 split_id_token = split_id[id_token];
+
+            while (split_id_token < current_split) {
+                if (id_token < equity_split[split_id_token].length){
+                    balance_to_withdraw += (equity_split[split_id_token][id_token])*base_split[split_id_token];
+                    split_id_token++;
+                }
+                else{
+                    split_id_token++;
+
+                }
+            }
+
+        }
+        return balance_to_withdraw;
+
+    }
+
+
 
 
     function level_up(uint256 tokenId, uint256 incrementation) public onlyOwner{
@@ -190,8 +213,35 @@ contract Nft_Collectible_Contract_equity is ERC721 {
     }
 
     function create_an_nft(uint256 amount) public payable {
-    
-  
+        require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
+        require(msg.value >= calculate_nft_price(amount), "Not enough sent");
+        for (uint256 i = 0; i<amount; i++){
+            _safeMint(msg.sender, tokenCounter);
+            _setTokenURI(tokenCounter,string(abi.encodePacked(token_uri,Strings.toString(tokenCounter))));
+            if(equity_differs){
+                if (random(tokenCounter)%100 == 0) {
+                    _equity.push(100); ///If God, set initial equity to 100
+                    nb_shares+=100;
+                }else if (random(tokenCounter)%10 == 0) {
+                    _equity.push(10);
+                    nb_shares+=10;
+                }else if (random(tokenCounter)%5 == 0) {
+                    _equity.push(5);
+                    nb_shares+=5;
+                }else {
+                    _equity.push(1);
+                    nb_shares++;
+                }
+            }else{
+                _equity.push(1);
+                nb_shares++;
+            }
+
+            tokenCounter = tokenCounter + 1;
+        }
+    }
+
+    function calculate_nft_price(uint256 amount) public view returns(uint256){
         uint256 price = 0;
         uint256 amountleft = amount;
         uint256 temptokenCounter = tokenCounter;
@@ -264,34 +314,8 @@ contract Nft_Collectible_Contract_equity is ERC721 {
             }
             
         }
+        return price;
 
-        require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
-        require(msg.value >= price, "Not enough sent");
-        for (uint256 i = 0; i<amount; i++){
-            uint newItemId = tokenCounter;
-            _safeMint(msg.sender, newItemId);
-            _setTokenURI(newItemId,string(abi.encodePacked(token_uri,Strings.toString(newItemId))));
-            if(equity_differs){
-                if (random(newItemId)%100 == 0) {
-                    _equity.push(100); ///If God, set initial equity to 100
-                    nb_shares+=100;
-                }else if (random(newItemId)%10 == 0) {
-                    _equity.push(10);
-                    nb_shares+=10;
-                }else if (random(newItemId)%5 == 0) {
-                    _equity.push(5);
-                    nb_shares+=5;
-                }else {
-                    _equity.push(1);
-                    nb_shares++;
-                }
-            }else{
-                _equity.push(1);
-                nb_shares++;
-            }
-
-            tokenCounter = tokenCounter + 1;
-        }
     }
 
     function create_nft_at_address (uint256 amount, address receiver) public onlyOwner {

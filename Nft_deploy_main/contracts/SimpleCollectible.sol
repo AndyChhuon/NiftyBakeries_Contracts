@@ -91,7 +91,7 @@ contract Nft_Collectible_Contract is ERC721 {
     }
     
 
-    function withdraw_balance() public {
+    function withdraw_balance() public { //Called by nft owners
         require(!locked, "Reentrant call detected!"); ///Prevent reentracy
         locked = true;
         uint256 balance_to_withdraw =0;
