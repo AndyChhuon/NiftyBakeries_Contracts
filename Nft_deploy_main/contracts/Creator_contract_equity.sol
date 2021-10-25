@@ -38,6 +38,8 @@ contract Nft_Collectible_Contract_equity is ERC721 {
     uint256 public current_split;
     uint256 public split_time=0;
     uint256 public nb_shares =0;
+    string public contractual_promise;
+    string public name_nft;
     bool public equity_differs = true;
 
 
@@ -55,7 +57,7 @@ contract Nft_Collectible_Contract_equity is ERC721 {
 
 
 
-    constructor (string memory nft_name, string memory nft_symbol, uint256 max, bool max_locked,string memory updated_uri, address affiliate, uint256 equity_shared, bool equity_varies) public ERC721 (nft_name, nft_symbol){
+    constructor (string memory nft_name, string memory nft_symbol, uint256 max, bool max_locked,string memory updated_uri, address affiliate, uint256 equity_shared,bool equity_varies, string memory promise_contract) public ERC721 (nft_name, nft_symbol){
         tokenCounter = 0;
         my_address = 0xB9e7b422E851c2d92C1a3B0C99c930eD95693918; //Change
         affiliate_address = affiliate;
@@ -63,6 +65,8 @@ contract Nft_Collectible_Contract_equity is ERC721 {
         locked_max = max_locked;
         equity_differs = equity_varies;
         nft_equity_percentage = equity_shared;
+        contractual_promise= promise_contract;
+        name_nft = nft_name;
 
         _setOwner(msg.sender);
         change_base_tokenuri(updated_uri);
