@@ -83,7 +83,7 @@ contract Nft_Collectible_Contract_equity is ERC721 {
 
     }
 
-    function set_nft_price(uint256 nft_price1, uint256 nft_price2, uint256 nft_price3, uint256 nft_price4, uint256 nft_price5, uint256 nft_price6, uint256 nft_price7) public onlyOwner{ //Set prices for nfts in eth
+    function set_nft_price(uint256 nft_price1, uint256 nft_price2, uint256 nft_price3, uint256 nft_price4, uint256 nft_price5, uint256 nft_price6, uint256 nft_price7, uint256 range_price1, uint256 range_price2, uint256 range_price3, uint256 range_price4, uint256 range_price5, uint256 range_price6, uint256 range_price7) public onlyOwner{ //Set prices for nfts in eth
         price1 = nft_price1; ///Needs to be set in wei, not eth
         price2 = nft_price2;
         price3 = nft_price3;
@@ -91,9 +91,6 @@ contract Nft_Collectible_Contract_equity is ERC721 {
         price5 = nft_price5;
         price6 = nft_price6;
         price7 = nft_price7;
-    }
-
-    function set_nft_price_max_range(uint256 range_price1, uint256 range_price2, uint256 range_price3, uint256 range_price4, uint256 range_price5, uint256 range_price6, uint256 range_price7) public onlyOwner{
         max_price1 = range_price1; ///(at this token id, change price). Same price until max-1
         max_price2 = range_price2;
         max_price3 = range_price3;
@@ -102,6 +99,7 @@ contract Nft_Collectible_Contract_equity is ERC721 {
         max_price6 = range_price6;
         max_price7 = range_price7;
     }
+
 
     function set_max_tokens(uint256 update_max) public onlyOwner {
         require(locked_max == false, "updating max tokens is locked");
@@ -144,13 +142,10 @@ contract Nft_Collectible_Contract_equity is ERC721 {
 
         uint256 balance_split = msg.value; 
         
-        (bool success, ) = my_address.call{value:((balance_split)*4/100)}("");
+        (bool success, ) = my_address.call{value:((balance_split)*5/100)}("");
         require(success, "Transfer failed.");
 
-        (success, ) = affiliate_address.call{value:((balance_split)*2/100)}("");
-        require(success, "Transfer failed.");
-
-        total_split=(balance_split)*94/100; ///Find balance minus unclaimed balance from last split. And split 30% to nft holders.
+        total_split=(balance_split)*95/100; ///Find balance minus unclaimed balance from last split. And split 30% to nft holders.
         
         equity_split[current_split] = _equity; ///Assigns equity array to equity_split mapping for current split
         base_split[current_split]=total_split/nb_shares; ///Gives amount of gwei per share for current split
