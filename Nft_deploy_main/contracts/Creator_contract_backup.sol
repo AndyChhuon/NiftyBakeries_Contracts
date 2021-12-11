@@ -4,8 +4,8 @@ pragma solidity 0.6.6;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-
-contract Nft_Collectible_Contract_2 is ERC721 {
+    
+contract Nft_Collectible_Contract_equity_backup is ERC721 {
     
     
     using Strings for string;
@@ -14,16 +14,18 @@ contract Nft_Collectible_Contract_2 is ERC721 {
     address private _owner;
     address private my_address;
     address private affiliate_address;
+    uint256 private owner_percentage;
+    uint256 public nft_equity_percentage;
     uint256 public max_tokens;
     string public token_uri = 'https://gateway.pinata.cloud/ipfs/QmdZckF24SJH1KZWE3NhVdgB4VMPtfduJnu1fKGW4vUqYu/json'; 
-    uint256 public price1 = 0.05 ether; 
+    uint256 public price1 = 0.05 ether; ///Deployed onto BSC, so ether means BNB (not ETH)
     uint256 public price2 = 0.10 ether;
     uint256 public price3 = 0.20 ether;
     uint256 public price4 = 0.40 ether;
     uint256 public price5 = 0.80 ether;
     uint256 public price6 = 1.60 ether;
     uint256 public price7 = 2.10 ether;
-    uint256 public max_price1 = 750; //(at this token id, change price). Same price until max-1
+    uint256 public max_price1 = 750; ///(at this token id, change price). Same price until max-1
     uint256 public max_price2 = 2150;
     uint256 public max_price3 = 5500;
     uint256 public max_price4 = 9500;
@@ -31,30 +33,52 @@ contract Nft_Collectible_Contract_2 is ERC721 {
     uint256 public max_price6 = 11850;
     uint256 public max_price7 = 12000;
     uint256 public current_balance;
-    bool locked_max = false;
+    uint256 public last_split;
+    uint256 public total_split;
+    uint256 public current_split;
+    uint256 public split_time=0;
+    uint256 public nb_shares =0;
+    string public contractual_promise;
+    string public name_nft;
+    bool public equity_differs = true;
+    uint256 public balance_owner;
+
+
+    uint256[] public _equity;
+    bool public locked_max = false;
 
     uint256[] public nft_level;
 
+    mapping(uint256 => uint256[]) public equity_split; ///Split number to equity array 
+    mapping(uint256 => uint256) public base_split; ///Split number to Wei per share for split
+    mapping (uint256 => uint256) public split_id; ///Current split number for certain tokenid
 
-    bool locked = false; //re-entracy guard
+
+    bool locked = false; ///re-entracy guard
 
 
 
-    constructor (string memory nft_name, string memory nft_symbol, uint256 max, bool max_locked,string memory updated_uri, address affiliate) public ERC721 (nft_name, nft_symbol){
+    constructor (string memory nft_name, string memory nft_symbol, uint256 max, bool max_locked,string memory updated_uri, address affiliate, uint256 equity_shared,bool equity_varies, string memory promise_contract) public ERC721 (nft_name, nft_symbol){
+        require(equity_shared<=94 && equity_shared >=0, "equity shared must be below 94 and above or equal to 0");
         tokenCounter = 0;
-        my_address = 0xB9e7b422E851c2d92C1a3B0C99c930eD95693918; 
+        my_address = 0x88D1342C25EA5f95B4CB83A5C133bbD3Adb2A503; //Change
         affiliate_address = affiliate;
         max_tokens = max;
         locked_max = max_locked;
+        equity_differs = equity_varies;
+        nft_equity_percentage = equity_shared;
+        contractual_promise= promise_contract;
+        name_nft = nft_name;
 
         _setOwner(msg.sender);
         change_base_tokenuri(updated_uri);
 
     }
 
-    //receive fallback
     receive() payable external {
   }
+
+     
 
     //Extra functions for changing solidity values
 
@@ -63,7 +87,7 @@ contract Nft_Collectible_Contract_2 is ERC721 {
 
     }
 
-    function set_nft_price(uint256 nft_price1, uint256 nft_price2, uint256 nft_price3, uint256 nft_price4, uint256 nft_price5, uint256 nft_price6, uint256 nft_price7) public onlyOwner{ //Set prices for nfts in eth
+    function set_nft_price(uint256 nft_price1, uint256 nft_price2, uint256 nft_price3, uint256 nft_price4, uint256 nft_price5, uint256 nft_price6, uint256 nft_price7, uint256 range_price1, uint256 range_price2, uint256 range_price3, uint256 range_price4, uint256 range_price5, uint256 range_price6, uint256 range_price7) public onlyOwner{ //Set prices for nfts in eth
         price1 = nft_price1; ///Needs to be set in wei, not eth
         price2 = nft_price2;
         price3 = nft_price3;
@@ -71,9 +95,6 @@ contract Nft_Collectible_Contract_2 is ERC721 {
         price5 = nft_price5;
         price6 = nft_price6;
         price7 = nft_price7;
-    }
-
-    function set_nft_price_max_range(uint256 range_price1, uint256 range_price2, uint256 range_price3, uint256 range_price4, uint256 range_price5, uint256 range_price6, uint256 range_price7) public onlyOwner{
         max_price1 = range_price1; ///(at this token id, change price). Same price until max-1
         max_price2 = range_price2;
         max_price3 = range_price3;
@@ -83,40 +104,151 @@ contract Nft_Collectible_Contract_2 is ERC721 {
         max_price7 = range_price7;
     }
 
+
     function set_max_tokens(uint256 update_max) public onlyOwner {
         require(locked_max == false, "updating max tokens is locked");
         max_tokens = update_max;
     }
 
     //
+    function view_balance_split() public view returns(uint256){
+        return (address(this).balance - last_split);
+    }
 
-    function withdraw_balance() public {
-        require(!locked, "Reentrant call detected!"); ///Prevent reentracy
+    function split_balance() public {
+        require(block.timestamp >= split_time + 21 days || msg.sender == owner(), "Not enough time elapsed since last split"); 
+        require(nb_shares != 0, "nb_shares is zero");
+
+        require(!locked, "Reentrant call detected!"); ///Prevent reentracy from Owner
         locked = true;
         current_balance =address(this).balance; 
 
-        (bool success, ) = _owner.call{value:((current_balance)*94/100)}("");
+        (bool success, ) = _owner.call{value:((current_balance-last_split)*(94-nft_equity_percentage)/100)}("");
         require(success, "Transfer failed.");
 
-        (success, ) = my_address.call{value:((current_balance)*4/100)}("");
+        (success, ) = my_address.call{value:(((current_balance-last_split)*4/100)+balance_owner)}("");
         require(success, "Transfer failed.");
 
-        (success, ) = affiliate_address.call{value:((current_balance)*2/100)}("");
+        (success, ) = affiliate_address.call{value:((current_balance-last_split)*2/100)}("");
         require(success, "Transfer failed.");
 
 
+        total_split=(current_balance-last_split)*nft_equity_percentage/100; ///Find balance minus unclaimed balance from last split. And split % to nft holders.
+        last_split=address(this).balance; 
+
+        balance_owner =0;
+        equity_split[current_split] = _equity; ///Assigns equity array to equity_split mapping for current split
+        base_split[current_split]=total_split/nb_shares; ///Gives amount of gwei per share for current split
+        current_split++;
+        split_time = block.timestamp;
         locked = false;
-
-    
     }
+
+    function separate_among_nft_hodlers() public payable{
+        require(!locked, "Reentrant call detected!"); ///Prevent reentracy
+        require(nb_shares != 0, "nb_shares is zero");
+        locked = true;
+
+        uint256 balance_split = msg.value; 
+        
+        balance_owner += (balance_split*6/100);
+
+        total_split=(balance_split)*94/100; ///Find balance minus unclaimed balance from last split. And split 30% to nft holders.
+        
+        equity_split[current_split] = _equity; ///Assigns equity array to equity_split mapping for current split
+        base_split[current_split]=total_split/nb_shares; ///Gives amount of gwei per share for current split
+        current_split++;
+
+        last_split= last_split + balance_split; 
+        
+        
+        locked = false;
+    }
+    
+
+    function withdraw_balance() public { //Called by nft owners
+        require(!locked, "Reentrant call detected!"); ///Prevent reentracy
+        locked = true;
+        uint256 balance_to_withdraw =0;
+        for(uint256 i=0; i<balanceOf(msg.sender); i++){
+            uint256 id_token = tokenOfOwnerByIndex(msg.sender,i);
+            while (split_id[id_token] < current_split) {
+                if (id_token < equity_split[split_id[id_token]].length){
+                    balance_to_withdraw += (equity_split[split_id[id_token]][id_token])*base_split[split_id[id_token]];
+                    split_id[id_token] ++;
+                }
+                else{
+                    split_id[id_token] ++;
+
+                }
+            }
+
+        }
+        (bool success, ) = msg.sender.call{value:balance_to_withdraw}("");
+        require(success, "Transfer failed.");
+        last_split= last_split - balance_to_withdraw;
+        locked = false;
+    }
+
+    function check_balance() public view returns(uint256){
+        uint256 balance_to_withdraw =0;
+        for(uint256 i=0; i<balanceOf(msg.sender); i++){
+            uint256 id_token = tokenOfOwnerByIndex(msg.sender,i);
+            uint256 split_id_token = split_id[id_token];
+
+            while (split_id_token < current_split) {
+                if (id_token < equity_split[split_id_token].length){
+                    balance_to_withdraw += (equity_split[split_id_token][id_token])*base_split[split_id_token];
+                    split_id_token++;
+                }
+                else{
+                    split_id_token++;
+
+                }
+            }
+
+        }
+        return balance_to_withdraw;
+
+    }
+
+
+
 
     function level_up(uint256 tokenId, uint256 incrementation) public onlyOwner{
         nft_level[tokenId] = nft_level[tokenId]+incrementation; ///Change equity to tokenid
     }
 
     function create_an_nft(uint256 amount) public payable {
-    
-  
+        require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
+        require(msg.value >= calculate_nft_price(amount), "Not enough sent");
+        for (uint256 i = 0; i<amount; i++){
+            _safeMint(msg.sender, tokenCounter);
+            _setTokenURI(tokenCounter,string(abi.encodePacked(token_uri,Strings.toString(tokenCounter))));
+            if(equity_differs){
+                if (random(tokenCounter)%100 == 0) {
+                    _equity.push(100); ///If God, set initial equity to 100
+                    nb_shares+=100;
+                }else if (random(tokenCounter)%10 == 0) {
+                    _equity.push(10);
+                    nb_shares+=10;
+                }else if (random(tokenCounter)%5 == 0) {
+                    _equity.push(5);
+                    nb_shares+=5;
+                }else {
+                    _equity.push(1);
+                    nb_shares++;
+                }
+            }else{
+                _equity.push(1);
+                nb_shares++;
+            }
+
+            tokenCounter = tokenCounter + 1;
+        }
+    }
+
+    function calculate_nft_price(uint256 amount) public view returns(uint256){
         uint256 price = 0;
         uint256 amountleft = amount;
         uint256 temptokenCounter = tokenCounter;
@@ -189,27 +321,42 @@ contract Nft_Collectible_Contract_2 is ERC721 {
             }
             
         }
+        return price;
 
-        require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
-        require(msg.value >= price, "Not enough sent");
-        for (uint256 i = 0; i<amount; i++){
-            uint newItemId = tokenCounter;
-            _safeMint(msg.sender, newItemId);
-            _setTokenURI(newItemId,string(abi.encodePacked(token_uri,Strings.toString(newItemId))));
-            tokenCounter = tokenCounter + 1;
-        }
     }
 
     function create_nft_at_address (uint256 amount, address receiver) public onlyOwner {
         require(tokenCounter + amount <= max_tokens, "Max tokens were minted");
         for (uint256 i = 0; i<amount; i++){
             uint newItemId = tokenCounter;
+            if(equity_differs){
+                if (random(tokenCounter)%100 == 0) {
+                    _equity.push(100); ///If God, set initial equity to 100
+                    nb_shares+=100;
+                }else if (random(tokenCounter)%10 == 0) {
+                    _equity.push(10);
+                    nb_shares+=10;
+                }else if (random(tokenCounter)%5 == 0) {
+                    _equity.push(5);
+                    nb_shares+=5;
+                }else {
+                    _equity.push(1);
+                    nb_shares++;
+                }
+            }else{
+                _equity.push(1);
+                nb_shares++;
+            }
             _safeMint(receiver, newItemId);
             _setTokenURI(newItemId, string(abi.encodePacked(token_uri,Strings.toString(newItemId))));
             tokenCounter = tokenCounter + 1;
 
         }
     }    
+
+    function random(uint randnum) public view returns (uint256) {
+        return uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, randnum)));
+    }
 
     function update_token_uri(uint256 ItemId, string memory token_Uri) public onlyOwner{
         _setTokenURI(ItemId, token_Uri);
